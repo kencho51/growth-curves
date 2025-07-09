@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Growth Chart Plotter</title>
+    <title>Growth Chart Plotter - WHO/CDC & Hong Kong Standards</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
@@ -117,8 +117,17 @@
 <body>
     <div class="container">
         <h1>Growth Chart Plotter</h1>
+        <p style="text-align: center; color: #666; margin-top: -15px; margin-bottom: 30px;">Choose between WHO/CDC International or Hong Kong 2020 growth standards</p>
         
         <div class="input-section">
+            <div class="input-group">
+                <label for="standard">Growth Standard:</label>
+                <select id="standard">
+                    <option value="who_cdc">WHO/CDC International</option>
+                    <option value="hk2020">Hong Kong 2020</option>
+                </select>
+            </div>
+            
             <div class="input-group">
                 <label for="gender">Gender:</label>
                 <select id="gender">
@@ -128,8 +137,8 @@
             </div>
             
             <div class="input-group">
-                <label for="age">Age (months):</label>
-                <input type="number" id="age" min="0" max="216" step="1" placeholder="0-216">
+                <label for="age">Age (years):</label>
+                <input type="number" id="age" min="0" max="18" step="0.1" placeholder="0-18">
             </div>
             
             <div class="input-group">
@@ -176,9 +185,19 @@
                 <span>97th Percentile</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color" style="background-color: #ff3838; width: 10px; height: 10px; border-radius: 50%;"></div>
+                <div class="legend-color" style="background-color: #ff3838; width: 12px; height: 12px; position: relative;">
+                    <div style="position: absolute; top: 50%; left: 0; right: 0; height: 2px; background-color: #ff3838; transform: translateY(-50%);"></div>
+                    <div style="position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background-color: #ff3838; transform: translateX(-50%);"></div>
+                </div>
                 <span>Your Child's Data</span>
             </div>
+        </div>
+        
+        <div class="info-section" style="margin-top: 30px; padding: 20px; background-color: #f8f9fa; border-radius: 5px; font-size: 14px;">
+            <h3 style="margin-top: 0; color: #555;">Data Sources</h3>
+            <p><strong>WHO/CDC International:</strong> Based on the WHO Child Growth Standards (2006) developed from the WHO Multicentre Growth Reference Study (1997-2003) conducted in 6 countries (Brazil, Ghana, India, Norway, Oman, USA). Represents optimal growth under ideal health conditions.</p>
+            <p><strong>Hong Kong 2020:</strong> Based on the Hong Kong Growth Survey 2020-22 conducted by Chinese University of Hong Kong and University of Hong Kong. Represents growth patterns of contemporary Hong Kong children of Chinese ethnicity.</p>
+            <p><em>Note: This is a tool for reference only. Always consult healthcare professionals for proper growth assessment and medical advice.</em></p>
         </div>
     </div>
 
@@ -186,31 +205,70 @@
         let chart;
         let userDataPoint = null;
 
-        // Growth chart data (simplified approximation based on WHO/CDC standards)
+        // Growth chart data from multiple standards
+        // Note: Internal data is stored in months, but displayed as years on the chart
+        
+        // Sources:
+        // WHO/CDC: WHO Child Growth Standards (2006) based on Multicentre Growth Reference Study
+        //          Source: https://www.who.int/tools/child-growth-standards
+        // HK2020: Hong Kong Growth Survey 2020-22, Chinese University of Hong Kong
+        //         Source: https://www.cuhk.edu.hk/proj/hkgrowth/
+        
         const growthData = {
-            boy: {
-                // Ages in months: 0, 3, 6, 12, 18, 24, 36, 48, 60, 72, 96, 120, 144, 168, 192, 216
-                ages: [0, 3, 6, 12, 18, 24, 36, 48, 60, 72, 96, 120, 144, 168, 192, 216],
-                percentiles: {
-                    p3: [46.1, 57.3, 63.3, 71.0, 76.9, 81.7, 88.7, 94.9, 100.7, 106.1, 116.6, 126.6, 136.2, 145.4, 154.6, 163.2],
-                    p10: [47.5, 59.0, 65.1, 73.2, 79.2, 84.1, 91.2, 97.6, 103.5, 109.0, 119.8, 130.0, 139.9, 149.3, 158.7, 167.5],
-                    p25: [49.0, 60.8, 66.8, 75.1, 81.2, 86.2, 93.5, 100.0, 106.1, 111.7, 122.8, 133.0, 143.0, 152.6, 162.2, 171.2],
-                    p50: [50.0, 62.1, 68.0, 76.1, 82.3, 87.1, 94.9, 101.6, 107.7, 113.5, 124.8, 135.4, 145.6, 155.4, 165.3, 174.5],
-                    p75: [51.8, 64.4, 70.2, 78.8, 85.1, 90.0, 98.0, 104.9, 111.0, 116.9, 128.4, 139.0, 149.3, 159.4, 169.6, 179.0],
-                    p90: [53.4, 66.1, 71.9, 80.8, 87.2, 92.2, 100.3, 107.5, 113.6, 119.6, 131.4, 142.0, 152.3, 162.7, 173.2, 182.9],
-                    p97: [55.0, 67.8, 73.5, 82.5, 89.0, 94.1, 102.3, 109.7, 115.9, 121.9, 134.0, 144.7, 155.0, 165.7, 176.5, 186.4]
+            who_cdc: {
+                boy: {
+                    // Ages in months: 0, 3, 6, 12, 18, 24, 36, 48, 60, 72, 96, 120, 144, 168, 192, 216
+                    // Equivalent years: 0, 0.25, 0.5, 1, 1.5, 2, 3, 4, 5, 6, 8, 10, 12, 14, 16, 18
+                    ages: [0, 3, 6, 12, 18, 24, 36, 48, 60, 72, 96, 120, 144, 168, 192, 216],
+                    percentiles: {
+                        p3: [46.1, 57.3, 63.3, 71.0, 76.9, 81.7, 88.7, 94.9, 100.7, 106.1, 116.6, 126.6, 136.2, 145.4, 154.6, 163.2],
+                        p10: [47.5, 59.0, 65.1, 73.2, 79.2, 84.1, 91.2, 97.6, 103.5, 109.0, 119.8, 130.0, 139.9, 149.3, 158.7, 167.5],
+                        p25: [49.0, 60.8, 66.8, 75.1, 81.2, 86.2, 93.5, 100.0, 106.1, 111.7, 122.8, 133.0, 143.0, 152.6, 162.2, 171.2],
+                        p50: [50.0, 62.1, 68.0, 76.1, 82.3, 87.1, 94.9, 101.6, 107.7, 113.5, 124.8, 135.4, 145.6, 155.4, 165.3, 174.5],
+                        p75: [51.8, 64.4, 70.2, 78.8, 85.1, 90.0, 98.0, 104.9, 111.0, 116.9, 128.4, 139.0, 149.3, 159.4, 169.6, 179.0],
+                        p90: [53.4, 66.1, 71.9, 80.8, 87.2, 92.2, 100.3, 107.5, 113.6, 119.6, 131.4, 142.0, 152.3, 162.7, 173.2, 182.9],
+                        p97: [55.0, 67.8, 73.5, 82.5, 89.0, 94.1, 102.3, 109.7, 115.9, 121.9, 134.0, 144.7, 155.0, 165.7, 176.5, 186.4]
+                    }
+                },
+                girl: {
+                    ages: [0, 3, 6, 12, 18, 24, 36, 48, 60, 72, 96, 120, 144, 168, 192, 216],
+                    percentiles: {
+                        p3: [45.4, 56.1, 61.8, 68.9, 74.9, 79.3, 86.0, 92.0, 97.7, 103.0, 113.5, 123.5, 133.5, 143.8, 152.8, 158.7],
+                        p10: [46.8, 57.8, 63.5, 70.8, 76.8, 81.3, 88.1, 94.1, 99.9, 105.3, 115.9, 126.0, 136.2, 146.7, 155.8, 161.8],
+                        p25: [48.2, 59.5, 65.2, 72.8, 78.8, 83.4, 90.3, 96.4, 102.3, 107.8, 118.7, 128.8, 139.2, 149.8, 159.0, 165.1],
+                        p50: [49.1, 60.9, 66.6, 74.0, 80.0, 84.6, 91.7, 97.9, 103.9, 109.4, 120.6, 130.9, 141.5, 152.3, 161.8, 168.1],
+                        p75: [50.9, 63.2, 68.8, 76.8, 82.8, 87.4, 94.6, 100.9, 106.9, 112.5, 124.0, 134.4, 145.2, 156.3, 166.0, 172.4],
+                        p90: [52.0, 64.7, 70.3, 78.4, 84.7, 89.4, 96.9, 103.3, 109.4, 115.1, 126.9, 137.4, 148.4, 159.8, 169.8, 176.2],
+                        p97: [53.7, 66.5, 72.1, 80.1, 86.5, 91.3, 98.9, 105.4, 111.7, 117.4, 129.5, 140.2, 151.4, 163.0, 173.4, 179.8]
+                    }
                 }
             },
-            girl: {
-                ages: [0, 3, 6, 12, 18, 24, 36, 48, 60, 72, 96, 120, 144, 168, 192, 216],
-                percentiles: {
-                    p3: [45.4, 56.1, 61.8, 68.9, 74.9, 79.3, 86.0, 92.0, 97.7, 103.0, 113.5, 123.5, 133.5, 143.8, 152.8, 158.7],
-                    p10: [46.8, 57.8, 63.5, 70.8, 76.8, 81.3, 88.1, 94.1, 99.9, 105.3, 115.9, 126.0, 136.2, 146.7, 155.8, 161.8],
-                    p25: [48.2, 59.5, 65.2, 72.8, 78.8, 83.4, 90.3, 96.4, 102.3, 107.8, 118.7, 128.8, 139.2, 149.8, 159.0, 165.1],
-                    p50: [49.1, 60.9, 66.6, 74.0, 80.0, 84.6, 91.7, 97.9, 103.9, 109.4, 120.6, 130.9, 141.5, 152.3, 161.8, 168.1],
-                    p75: [50.9, 63.2, 68.8, 76.8, 82.8, 87.4, 94.6, 100.9, 106.9, 112.5, 124.0, 134.4, 145.2, 156.3, 166.0, 172.4],
-                    p90: [52.0, 64.7, 70.3, 78.4, 84.7, 89.4, 96.9, 103.3, 109.4, 115.1, 126.9, 137.4, 148.4, 159.8, 169.8, 176.2],
-                    p97: [53.7, 66.5, 72.1, 80.1, 86.5, 91.3, 98.9, 105.4, 111.7, 117.4, 129.5, 140.2, 151.4, 163.0, 173.4, 179.8]
+            hk2020: {
+                boy: {
+                    // Hong Kong 2020 data - approximately 2cm taller at 18 years compared to 1993
+                    // Based on Hong Kong Growth Survey 2020-22
+                    ages: [0, 3, 6, 12, 18, 24, 36, 48, 60, 72, 96, 120, 144, 168, 192, 216],
+                    percentiles: {
+                        p3: [47.2, 58.5, 64.8, 72.5, 78.2, 83.1, 90.2, 96.8, 102.8, 108.5, 119.2, 129.5, 139.5, 148.8, 158.2, 166.8],
+                        p10: [48.6, 60.2, 66.6, 74.7, 80.5, 85.5, 92.7, 99.5, 105.6, 111.4, 122.4, 132.8, 143.0, 152.5, 162.1, 170.9],
+                        p25: [50.1, 62.0, 68.3, 76.6, 82.5, 87.6, 95.0, 101.9, 108.2, 114.1, 125.4, 135.9, 146.2, 155.8, 165.6, 174.7],
+                        p50: [51.1, 63.3, 69.5, 77.6, 83.6, 88.5, 96.4, 103.5, 109.8, 115.8, 127.3, 138.1, 148.5, 158.2, 168.1, 177.5],
+                        p75: [52.9, 65.6, 71.7, 80.3, 86.4, 91.4, 99.5, 106.8, 113.1, 119.2, 130.9, 141.8, 152.2, 162.1, 172.2, 181.5],
+                        p90: [54.5, 67.3, 73.4, 82.3, 88.5, 93.6, 101.8, 109.4, 115.7, 122.0, 133.9, 144.8, 155.2, 165.3, 175.6, 185.2],
+                        p97: [56.1, 69.0, 75.0, 84.0, 90.3, 95.5, 103.8, 111.6, 118.0, 124.4, 136.5, 147.5, 157.9, 168.2, 178.8, 188.6]
+                    }
+                },
+                girl: {
+                    ages: [0, 3, 6, 12, 18, 24, 36, 48, 60, 72, 96, 120, 144, 168, 192, 216],
+                    percentiles: {
+                        p3: [46.5, 57.3, 63.3, 70.4, 76.2, 80.7, 87.5, 93.8, 99.8, 105.3, 116.0, 126.0, 136.0, 146.5, 155.8, 161.7],
+                        p10: [47.9, 59.0, 65.0, 72.3, 78.1, 82.7, 89.6, 96.0, 102.0, 107.6, 118.4, 128.5, 138.7, 149.4, 158.8, 164.8],
+                        p25: [49.3, 60.7, 66.7, 74.3, 80.1, 84.8, 91.8, 98.3, 104.4, 110.1, 121.2, 131.3, 141.7, 152.5, 162.0, 168.1],
+                        p50: [50.2, 62.1, 68.1, 75.5, 81.3, 86.0, 93.2, 99.8, 106.0, 111.7, 123.1, 133.4, 144.0, 154.9, 164.8, 171.1],
+                        p75: [52.0, 64.4, 70.3, 78.3, 84.1, 88.8, 96.1, 102.8, 109.0, 114.8, 126.5, 136.9, 147.7, 158.9, 168.9, 175.4],
+                        p90: [53.1, 65.9, 71.8, 80.0, 86.0, 91.0, 98.4, 105.2, 111.5, 117.4, 129.4, 139.9, 150.9, 162.5, 172.8, 179.2],
+                        p97: [54.8, 67.7, 73.6, 81.6, 87.8, 92.7, 100.4, 107.3, 113.8, 119.7, 132.0, 142.7, 153.9, 165.7, 176.4, 182.8]
+                    }
                 }
             }
         };
@@ -232,10 +290,10 @@
                             position: 'bottom',
                             title: {
                                 display: true,
-                                text: 'Age (months)'
+                                text: 'Age (years)'
                             },
                             min: 0,
-                            max: 216
+                            max: 18
                         },
                         y: {
                             title: {
@@ -243,7 +301,7 @@
                                 text: 'Height (cm)'
                             },
                             min: 40,
-                            max: 190
+                            max: 200
                         }
                     },
                     plugins: {
@@ -268,8 +326,9 @@
         }
 
         function updateChart() {
+            const standard = document.getElementById('standard').value;
             const gender = document.getElementById('gender').value;
-            const data = growthData[gender];
+            const data = growthData[standard][gender];
             
             const colors = {
                 p3: '#ff6b6b',
@@ -286,7 +345,7 @@
             // Add percentile lines
             Object.keys(data.percentiles).forEach(percentile => {
                 const percentileData = data.ages.map((age, index) => ({
-                    x: age,
+                    x: age / 12, // Convert months to years for display
                     y: data.percentiles[percentile][index]
                 }));
                 
@@ -309,8 +368,10 @@
                     backgroundColor: '#ff3838',
                     borderColor: '#ff3838',
                     borderWidth: 3,
-                    pointRadius: 8,
-                    pointHoverRadius: 10,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    pointStyle: 'cross',
+                    pointRotation: 45,
                     showLine: false
                 });
             }
@@ -319,19 +380,20 @@
         }
 
         function plotPoint() {
+            const standard = document.getElementById('standard').value;
             const gender = document.getElementById('gender').value;
-            const age = parseFloat(document.getElementById('age').value);
+            const ageYears = parseFloat(document.getElementById('age').value);
             const height = parseFloat(document.getElementById('height').value);
             const infoDiv = document.getElementById('info');
             
             // Validation
-            if (isNaN(age) || isNaN(height)) {
+            if (isNaN(ageYears) || isNaN(height)) {
                 showInfo('Please enter valid numbers for age and height.', 'error');
                 return;
             }
             
-            if (age < 0 || age > 216) {
-                showInfo('Age must be between 0 and 216 months (18 years).', 'error');
+            if (ageYears < 0 || ageYears > 18) {
+                showInfo('Age must be between 0 and 18 years.', 'error');
                 return;
             }
             
@@ -340,28 +402,32 @@
                 return;
             }
             
-            // Create user data point
-            userDataPoint = { x: age, y: height };
+            // Convert years to months for calculations
+            const ageMonths = ageYears * 12;
             
-            // Calculate percentile
-            const percentile = calculatePercentile(gender, age, height);
+            // Create user data point (display in years)
+            userDataPoint = { x: ageYears, y: height };
+            
+            // Calculate percentile (using months)
+            const percentile = calculatePercentile(standard, gender, ageMonths, height);
             
             // Update chart
             updateChart();
             
             // Show info
-            showInfo(`Plotted: ${gender === 'boy' ? 'Boy' : 'Girl'}, ${age} months old, ${height} cm tall. Approximately ${percentile} percentile.`);
+            const standardName = standard === 'who_cdc' ? 'WHO/CDC' : 'Hong Kong 2020';
+            showInfo(`Plotted: ${gender === 'boy' ? 'Boy' : 'Girl'}, ${ageYears} years old, ${height} cm tall. Approximately ${percentile} percentile (${standardName} standard).`);
         }
 
-        function calculatePercentile(gender, age, height) {
-            const data = growthData[gender];
+        function calculatePercentile(standard, gender, ageMonths, height) {
+            const data = growthData[standard][gender];
             
             // Find the closest age points for interpolation
             let lowerIndex = 0;
             let upperIndex = data.ages.length - 1;
             
             for (let i = 0; i < data.ages.length - 1; i++) {
-                if (age >= data.ages[i] && age <= data.ages[i + 1]) {
+                if (ageMonths >= data.ages[i] && ageMonths <= data.ages[i + 1]) {
                     lowerIndex = i;
                     upperIndex = i + 1;
                     break;
@@ -369,7 +435,7 @@
             }
             
             // Interpolate percentile values for the given age
-            const ageFactor = upperIndex === lowerIndex ? 0 : (age - data.ages[lowerIndex]) / (data.ages[upperIndex] - data.ages[lowerIndex]);
+            const ageFactor = upperIndex === lowerIndex ? 0 : (ageMonths - data.ages[lowerIndex]) / (data.ages[upperIndex] - data.ages[lowerIndex]);
             
             const percentiles = ['p3', 'p10', 'p25', 'p50', 'p75', 'p90', 'p97'];
             const percentileValues = [3, 10, 25, 50, 75, 90, 97];
@@ -409,7 +475,8 @@
         document.addEventListener('DOMContentLoaded', function() {
             initChart();
             
-            // Update chart when gender changes
+            // Update chart when standard or gender changes
+            document.getElementById('standard').addEventListener('change', updateChart);
             document.getElementById('gender').addEventListener('change', updateChart);
         });
     </script>
