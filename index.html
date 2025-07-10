@@ -281,15 +281,55 @@
                             display: false
                         },
                         tooltip: {
-                            mode: 'point',
-                            intersect: false
+                            mode: 'nearest',
+                            intersect: false,
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: 'white',
+                            bodyColor: 'white',
+                            borderColor: 'rgba(255, 255, 255, 0.3)',
+                            borderWidth: 1,
+                            cornerRadius: 6,
+                            displayColors: true,
+                            callbacks: {
+                                title: function(context) {
+                                    const ageYears = context[0].parsed.x;
+                                    return `Age: ${ageYears} years`;
+                                },
+                                label: function(context) {
+                                    const height = context.parsed.y;
+                                    const datasetLabel = context.dataset.label;
+                                    
+                                    // Don't show tooltip for user's plotted point
+                                    if (datasetLabel === 'Your Child') {
+                                        return `${datasetLabel}: ${height} cm`;
+                                    }
+                                    
+                                    return `${datasetLabel}: ${height} cm`;
+                                },
+                                afterLabel: function(context) {
+                                    const datasetLabel = context.dataset.label;
+                                    if (datasetLabel === 'Your Child') {
+                                        return 'Your child\'s measurement';
+                                    }
+                                    return 'Growth percentile curve';
+                                }
+                            }
                         }
                     },
                     elements: {
                         point: {
                             radius: 0,
-                            hoverRadius: 5
+                            hoverRadius: 6,
+                            hoverBorderWidth: 2
+                        },
+                        line: {
+                            borderWidth: 2,
+                            hoverBorderWidth: 3
                         }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'nearest'
                     }
                 }
             });
