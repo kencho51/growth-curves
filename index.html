@@ -3,7 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Growth Chart Plotter - WHO/CDC & Hong Kong Standards</title>
+    
+    <!-- Primary Meta Tags -->
+    <title>Growth Chart Plotter - WHO/CDC & Hong Kong 2020 Standards | Height Percentile Calculator</title>
+    <meta name="title" content="Growth Chart Plotter - WHO/CDC & Hong Kong 2020 Standards | Height Percentile Calculator">
+    <meta name="description" content="Interactive growth chart tool for children 0-18 years. Plot height percentiles using WHO/CDC International or Hong Kong 2020 growth standards. Free online height percentile calculator for boys and girls.">
+    <meta name="keywords" content="growth chart, height percentile, children growth, WHO growth standards, Hong Kong growth chart, pediatric growth, height calculator, child development, growth percentile calculator">
+    <meta name="author" content="Growth Chart Tool">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://growth-curves.superbrains.cc">
+    <meta property="og:title" content="Growth Chart Plotter - WHO/CDC & Hong Kong 2020 Standards">
+    <meta property="og:description" content="Interactive growth chart tool for children 0-18 years. Plot height percentiles using WHO/CDC International or Hong Kong 2020 growth standards.">
+    <!-- <meta property="og:image" content="https://yourdomain.com/growth-chart-preview.png"> -->
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://yourdomain.com/">
+    <meta property="twitter:title" content="Growth Chart Plotter - WHO/CDC & Hong Kong 2020 Standards">
+    <meta property="twitter:description" content="Interactive growth chart tool for children 0-18 years. Plot height percentiles using WHO/CDC International or Hong Kong 2020 growth standards.">
+    <!-- <meta property="twitter:image" content="https://yourdomain.com/growth-chart-preview.png"> -->
+    
+    <!-- Additional SEO Meta Tags -->
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="distribution" content="global">
+    <meta name="rating" content="general">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://growth-curves.superbrains.cc">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    
+    <!-- Schema.org Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Growth Chart Plotter",
+        "description": "Interactive growth chart tool for children 0-18 years using WHO/CDC International or Hong Kong 2020 growth standards",
+        "url": "https://yourdomain.com/",
+        "applicationCategory": "HealthApplication",
+        "operatingSystem": "Any",
+        "permissions": "none",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "author": {
+            "@type": "Organization",
+            "name": "Growth Chart Tool"
+        },
+        "provider": {
+            "@type": "Organization",
+            "name": "Growth Chart Tool"
+        },
+        "inLanguage": "en",
+        "isAccessibleForFree": true,
+        "keywords": ["growth chart", "height percentile", "children growth", "WHO standards", "Hong Kong growth standards"],
+        "about": {
+            "@type": "MedicalCondition",
+            "name": "Child Growth and Development"
+        }
+    }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
@@ -116,8 +184,10 @@
 </head>
 <body>
     <div class="container">
-        <h1>Growth Chart Plotter</h1>
-        <p style="text-align: center; color: #666; margin-top: -15px; margin-bottom: 30px;">Choose between WHO/CDC International or Hong Kong 2020 growth standards</p>
+        <header>
+            <h1>Growth Chart Plotter</h1>
+            <p style="text-align: center; color: #666; margin-top: -15px; margin-bottom: 30px;">Interactive height percentile calculator for children 0-18 years using Hong Kong 2020 or WHO/CDC International growth standards</p>
+        </header>
         
         <div class="input-section">
             <div class="input-group">
@@ -159,12 +229,29 @@
             <!-- Legend will be populated dynamically -->
         </div>
         
-        <div class="info-section" style="margin-top: 30px; padding: 20px; background-color: #f8f9fa; border-radius: 5px; font-size: 14px;">
+        <section class="usage-guide" style="margin-top: 30px; padding: 20px; background-color: #f0f8ff; border-radius: 5px; border-left: 4px solid #007bff;">
+            <h2 style="margin-top: 0; color: #333; font-size: 18px;">How to Use This Growth Chart Calculator</h2>
+            <ol style="color: #555; line-height: 1.6;">
+                <li><strong>Select Growth Standard:</strong> Choose between WHO/CDC International or Hong Kong 2020 standards</li>
+                <li><strong>Choose Gender:</strong> Select boy or girl</li>
+                <li><strong>Enter Age:</strong> Input age in years (0-18 years, accepts decimals like 5.5)</li>
+                <li><strong>Enter Height:</strong> Input height in centimeters</li>
+                <li><strong>Plot Point:</strong> Click "Plot on Chart" to see where your child's measurement falls on the growth curve</li>
+            </ol>
+        </section>
+
+        <section class="info-section" style="margin-top: 20px; padding: 20px; background-color: #f8f9fa; border-radius: 5px; font-size: 14px;">
             <h3 style="margin-top: 0; color: #555;">Data Sources</h3>
-            <p><strong>WHO/CDC International:</strong> Based on the WHO Child Growth Standards (2006) developed from the WHO Multicentre Growth Reference Study (1997-2003) conducted in 6 countries (Brazil, Ghana, India, Norway, Oman, USA). Represents optimal growth under ideal health conditions.</p>
-            <p><strong>Hong Kong 2020:</strong> Based on the Hong Kong Growth Survey 2020-22 conducted by Chinese University of Hong Kong and University of Hong Kong. Represents growth patterns of contemporary Hong Kong children of Chinese ethnicity.</p>
-            <p><em>Note: This is a tool for reference only. Always consult healthcare professionals for proper growth assessment and medical advice.</em></p>
-        </div>
+                <p><strong>WHO/CDC International:</strong> Based on the WHO Child Growth Standards (2006) developed from the WHO Multicentre Growth Reference Study (1997-2003) conducted in 6 countries (Brazil, Ghana, India, Norway, Oman, USA). Represents optimal growth under ideal health conditions.</p>
+                <p><strong>Hong Kong 2020:</strong> Based on the Hong Kong Growth Survey 2020-22 conducted by Chinese University of Hong Kong and University of Hong Kong. Represents growth patterns of contemporary Hong Kong children of Chinese ethnicity.</p>
+                <p><em>Note: This is a tool for reference only. Always consult healthcare professionals for proper growth assessment and medical advice.</em></p>
+            </div>
+
+            <div class="disclaimer" style="background-color: #fff3cd; padding: 15px; border-radius: 4px; border-left: 4px solid #ffc107;">
+                <h3 style="color: #856404; font-size: 16px; margin-top: 0; margin-bottom: 8px;">Important Medical Disclaimer</h3>
+                <p style="color: #856404; margin-bottom: 0;"><em>This growth chart calculator is for reference and educational purposes only. It should not replace professional medical advice, diagnosis, or treatment. Always consult qualified healthcare professionals for proper growth assessment, medical advice, and any concerns about your child's development.</em></p>
+            </div>
+        </section>
     </div>
 
     <script>
