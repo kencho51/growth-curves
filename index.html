@@ -184,13 +184,13 @@
                 <div class="legend-color" style="background-color: #ff6b6b;"></div>
                 <span>97th Percentile</span>
             </div>
-            <div class="legend-item">
+            <!-- <div class="legend-item">
                 <div class="legend-color" style="background-color: #ff3838; width: 12px; height: 12px; position: relative;">
                     <div style="position: absolute; top: 50%; left: 0; right: 0; height: 2px; background-color: #ff3838; transform: translateY(-50%);"></div>
                     <div style="position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background-color: #ff3838; transform: translateX(-50%);"></div>
                 </div>
-                <span>Your Child's Data</span>
-            </div>
+                <span>Your Child's Data</span> 
+            </div> -->
         </div>
         
         <div class="info-section" style="margin-top: 30px; padding: 20px; background-color: #f8f9fa; border-radius: 5px; font-size: 14px;">
@@ -360,7 +360,7 @@
                 });
             });
             
-            // Add user data point if exists
+            // Add user data point if exists (ensure it's on top)
             if (userDataPoint) {
                 chart.data.datasets.push({
                     label: 'Your Child',
@@ -368,11 +368,13 @@
                     backgroundColor: '#ff3838',
                     borderColor: '#ff3838',
                     borderWidth: 3,
-                    pointRadius: 6,
-                    pointHoverRadius: 8,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
                     pointStyle: 'cross',
                     pointRotation: 45,
-                    showLine: false
+                    showLine: false,
+                    order: -1, // Ensures this dataset is rendered on top
+                    zIndex: 1000 // Additional z-index for visibility
                 });
             }
             
