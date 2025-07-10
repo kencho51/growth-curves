@@ -17,7 +17,14 @@
     <meta property="og:url" content="https://growth-curves.superbrains.cc">
     <meta property="og:title" content="Growth Chart Plotter - WHO/CDC & Hong Kong 2020 Standards">
     <meta property="og:description" content="Interactive growth chart tool for children 0-18 years. Plot height percentiles using WHO/CDC International or Hong Kong 2020 growth standards.">
-    <!-- <meta property="og:image" content="https://yourdomain.com/growth-chart-preview.png"> -->
+    <!-- <meta property="og:image" content="https://growth-curves.superbrains.cc/growth-chart-preview.png"> -->
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://growth-curves.superbrains.cc/">
+    <meta property="twitter:title" content="Growth Chart Plotter - WHO/CDC & Hong Kong 2020 Standards">
+    <meta property="twitter:description" content="Interactive growth chart tool for children 0-18 years. Plot height percentiles using WHO/CDC International or Hong Kong 2020 growth standards.">
+    <!-- <meta property="twitter:image" content="https://growth-curves.superbrains.cc/growth-chart-preview.png"> -->
     
     <!-- Additional SEO Meta Tags -->
     <meta name="language" content="English">
@@ -39,7 +46,7 @@
         "@type": "WebApplication",
         "name": "Growth Chart Plotter",
         "description": "Interactive growth chart tool for children 0-18 years using WHO/CDC International or Hong Kong 2020 growth standards",
-        "url": "https://yourdomain.com/",
+        "url": "https://growth-curves.superbrains.cc/",
         "applicationCategory": "HealthApplication",
         "operatingSystem": "Any",
         "permissions": "none",
@@ -135,6 +142,27 @@
             background-color: #45a049;
         }
         
+        .button-secondary {
+            background-color: #2196F3;
+        }
+        
+        .button-secondary:hover {
+            background-color: #1976D2;
+        }
+        
+        .button-danger {
+            background-color: #f44336;
+        }
+        
+        .button-danger:hover {
+            background-color: #d32f2f;
+        }
+        
+        .button-small {
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+        
         .chart-container {
             position: relative;
             height: 600px;
@@ -173,6 +201,71 @@
             width: 20px;
             height: 3px;
         }
+        
+        /* Saved Points Styles */
+        .saved-points-section {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #2196F3;
+        }
+        
+        .saved-points-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .saved-points-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .saved-point-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background-color: white;
+            border-radius: 5px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .saved-point-info {
+            flex: 1;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .saved-point-label {
+            font-weight: bold;
+            color: #333;
+            min-width: 120px;
+        }
+        
+        .saved-point-details {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .saved-point-marker {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .no-saved-points {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 20px;
+        }
     </style>
 </head>
 <body>
@@ -209,7 +302,13 @@
                 <input type="number" id="height" min="30" max="200" step="0.1" placeholder="30-200">
             </div>
             
+            <div class="input-group">
+                <label for="pointLabel">Label (optional):</label>
+                <input type="text" id="pointLabel" placeholder="e.g., John - 6 months" maxlength="30">
+            </div>
+            
             <button onclick="plotPoint()">Plot on Chart</button>
+            <button onclick="savePoint()" class="button-secondary">Save Point</button>
         </div>
         
         <div class="chart-container">
@@ -226,6 +325,17 @@
             <!-- Legend will be populated dynamically -->
         </div>
         
+        <!-- Saved Points Management Section -->
+        <div class="saved-points-section" id="savedPointsSection" style="display: none;">
+            <div class="saved-points-header">
+                <h3 style="margin: 0; color: #333;">Saved Data Points</h3>
+                <button onclick="clearAllPoints()" class="button-danger button-small">Clear All</button>
+            </div>
+            <div class="saved-points-list" id="savedPointsList">
+                <!-- Saved points will be populated dynamically -->
+            </div>
+        </div>
+        
         <section class="usage-guide" style="margin-top: 30px; padding: 20px; background-color: #f0f8ff; border-radius: 5px; border-left: 4px solid #007bff;">
             <h2 style="margin-top: 0; color: #333; font-size: 18px;">How to Use This Growth Chart Calculator</h2>
             <ol style="color: #555; line-height: 1.6;">
@@ -233,7 +343,10 @@
                 <li><strong>Choose Gender:</strong> Select boy or girl</li>
                 <li><strong>Enter Age:</strong> Input age in years (0-18 years, accepts decimals like 5.5)</li>
                 <li><strong>Enter Height:</strong> Input height in centimeters</li>
-                <li><strong>Plot Point:</strong> Click "Plot on Chart" to see where your child's measurement falls on the growth curve</li>
+                <li><strong>Add Label (Optional):</strong> Give a name to track this measurement (e.g., "John - 6 months")</li>
+                <li><strong>Plot Point:</strong> Click "Plot on Chart" to see where the measurement falls</li>
+                <li><strong>Save Point:</strong> Click "Save Point" to permanently save this measurement for tracking</li>
+                <li><strong>Track Growth:</strong> Add multiple points over time to track growth patterns</li>
             </ol>
         </section>
 
@@ -253,8 +366,16 @@
 
     <script>
         let chart;
-        let userDataPoint = null;
         let growthData = null; // Will be loaded from external JSON files
+        let savedDataPoints = []; // Array to store multiple saved points
+        let currentPlotPoint = null; // Temporarily plotted point (before saving)
+
+        // Colors for different saved points
+        const POINT_COLORS = [
+            '#ff3838', '#2196F3', '#4CAF50', '#FF9800', '#9C27B0',
+            '#607D8B', '#795548', '#E91E63', '#009688', '#FFC107',
+            '#3F51B5', '#8BC34A', '#FF5722', '#673AB7', '#CDDC39'
+        ];
 
         // Data loading functions
         async function loadGrowthData() {
@@ -281,6 +402,9 @@
                 // Hide loading indicator
                 document.getElementById('loading').style.display = 'none';
                 
+                // Load saved points from localStorage
+                loadSavedPoints();
+                
                 // Initialize chart after data is loaded
                 initChart();
                 updateLegend();
@@ -292,6 +416,28 @@
                 // Hide loading indicator and show error
                 document.getElementById('loading').style.display = 'none';
                 showInfo('Error loading growth chart data. Please refresh the page.', 'error');
+            }
+        }
+
+        // Local Storage Functions
+        function loadSavedPoints() {
+            try {
+                const saved = localStorage.getItem('growthChart_savedPoints');
+                if (saved) {
+                    savedDataPoints = JSON.parse(saved);
+                    updateSavedPointsList();
+                }
+            } catch (error) {
+                console.error('Error loading saved points:', error);
+                savedDataPoints = [];
+            }
+        }
+
+        function saveSavedPoints() {
+            try {
+                localStorage.setItem('growthChart_savedPoints', JSON.stringify(savedDataPoints));
+            } catch (error) {
+                console.error('Error saving points to localStorage:', error);
             }
         }
 
@@ -343,24 +489,29 @@
                             displayColors: true,
                             callbacks: {
                                 title: function(context) {
-                                    const ageYears = context[0].parsed.x;
-                                    return `Age: ${ageYears} years`;
+                                    const point = context[0];
+                                    if (point.dataset.pointData) {
+                                        const data = point.dataset.pointData;
+                                        return data.label || `${data.gender === 'boy' ? 'Boy' : 'Girl'} - ${data.age} years`;
+                                    }
+                                    return `Age: ${point.parsed.x} years`;
                                 },
                                 label: function(context) {
-                                    const height = context.parsed.y;
-                                    const datasetLabel = context.dataset.label;
-                                    
-                                    // Don't show tooltip for user's plotted point
-                                    if (datasetLabel === 'Your Child') {
-                                        return `${datasetLabel}: ${height} cm`;
+                                    const point = context.dataset.pointData;
+                                    if (point) {
+                                        return [
+                                            `Height: ${point.height} cm`,
+                                            `Percentile: ${point.percentile}`,
+                                            `Standard: ${point.standard === 'who_cdc' ? 'WHO/CDC' : 'Hong Kong 2020'}`,
+                                            `Date: ${point.date}`
+                                        ];
                                     }
-                                    
-                                    return `${datasetLabel}: ${height} cm`;
+                                    return `${context.dataset.label}: ${context.parsed.y} cm`;
                                 },
                                 afterLabel: function(context) {
                                     const datasetLabel = context.dataset.label;
-                                    if (datasetLabel === 'Your Child') {
-                                        return 'Your child\'s measurement';
+                                    if (datasetLabel.includes('Saved:') || datasetLabel === 'Current Plot') {
+                                        return 'Growth measurement';
                                     }
                                     return 'Growth percentile curve';
                                 }
@@ -369,7 +520,7 @@
                     },
                     elements: {
                         point: {
-                            radius: 0,
+                            radius: 1,
                             hoverRadius: 6,
                             hoverBorderWidth: 2
                         },
@@ -474,25 +625,46 @@
                     backgroundColor: colors[percentile],
                     borderWidth: percentile === 'p50' ? 3 : 2,
                     fill: false,
-                    tension: 0.4
+                    tension: 0.4,
+                    pointRadius: 0,
+                    pointHoverRadius: 4
                 });
             });
             
-            // Add user data point if exists (ensure it's on top)
-            if (userDataPoint) {
+            // Add saved data points (each as its own dataset)
+            savedDataPoints.forEach((point, index) => {
+                const color = POINT_COLORS[index % POINT_COLORS.length];
                 chart.data.datasets.push({
-                    label: 'Your Child',
-                    data: [userDataPoint],
-                    backgroundColor: '#ff3838',
-                    borderColor: '#ff3838',
+                    label: `Saved: ${point.label || `Point ${index + 1}`}`,
+                    data: [{ x: point.age, y: point.height }],
+                    backgroundColor: color,
+                    borderColor: color,
                     borderWidth: 3,
-                    pointRadius: 5,
-                    pointHoverRadius: 7,
-                    pointStyle: 'cross',
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    pointStyle: 'crossRot',
                     pointRotation: 45,
                     showLine: false,
-                    order: -1, // Ensures this dataset is rendered on top
-                    zIndex: 1000 // Additional z-index for visibility
+                    order: -10,
+                    pointData: point // Store full point data for tooltips
+                });
+            });
+            
+            // Add current plot point if exists (temporary, before saving)
+            if (currentPlotPoint) {
+                chart.data.datasets.push({
+                    label: 'Current Plot',
+                    data: [{ x: currentPlotPoint.age, y: currentPlotPoint.height }],
+                    backgroundColor: '#FF6B35',
+                    borderColor: '#FF6B35',
+                    borderWidth: 3,
+                    pointRadius: 7,
+                    pointHoverRadius: 9,
+                    pointStyle: 'crossRot',
+                    pointRotation: 45,
+                    showLine: false,
+                    order: -20,
+                    pointData: currentPlotPoint // Store full point data for tooltips
                 });
             }
             
@@ -511,7 +683,7 @@
             const gender = document.getElementById('gender').value;
             const ageYears = parseFloat(document.getElementById('age').value);
             const height = parseFloat(document.getElementById('height').value);
-            const infoDiv = document.getElementById('info');
+            const label = document.getElementById('pointLabel').value.trim();
             
             // Validation
             if (isNaN(ageYears) || isNaN(height)) {
@@ -532,18 +704,115 @@
             // Convert years to months for calculations
             const ageMonths = ageYears * 12;
             
-            // Create user data point (display in years)
-            userDataPoint = { x: ageYears, y: height };
-            
             // Calculate percentile (using months)
             const percentile = calculatePercentile(standard, gender, ageMonths, height);
+            
+            // Create current plot point (display in years)
+            currentPlotPoint = {
+                id: Date.now(),
+                label: label || null,
+                standard: standard,
+                gender: gender,
+                age: ageYears,
+                height: height,
+                percentile: percentile,
+                date: new Date().toLocaleDateString()
+            };
             
             // Update chart
             updateChart();
             
             // Show info
             const standardName = standard === 'who_cdc' ? 'WHO/CDC' : 'Hong Kong 2020';
-            showInfo(`Plotted: ${gender === 'boy' ? 'Boy' : 'Girl'}, ${ageYears} years old, ${height} cm tall. Approximately ${percentile} percentile (${standardName} standard).`);
+            showInfo(`Plotted: ${gender === 'boy' ? 'Boy' : 'Girl'}, ${ageYears} years old, ${height} cm tall. Approximately ${percentile} percentile (${standardName} standard). Click "Save Point" to permanently save this measurement.`);
+        }
+
+        function savePoint() {
+            if (!currentPlotPoint) {
+                showInfo('Please plot a point first before saving.', 'error');
+                return;
+            }
+            
+            // Add to saved points
+            savedDataPoints.push({ ...currentPlotPoint });
+            
+            // Clear current plot point
+            currentPlotPoint = null;
+            
+            // Save to localStorage
+            saveSavedPoints();
+            
+            // Update displays
+            updateChart();
+            updateSavedPointsList();
+            
+            // Clear the form
+            document.getElementById('pointLabel').value = '';
+            
+            showInfo(`Point saved successfully! You now have ${savedDataPoints.length} saved measurement${savedDataPoints.length === 1 ? '' : 's'}.`);
+        }
+
+        function deletePoint(pointId) {
+            savedDataPoints = savedDataPoints.filter(point => point.id !== pointId);
+            saveSavedPoints();
+            updateChart();
+            updateSavedPointsList();
+            
+            if (savedDataPoints.length === 0) {
+                showInfo('All points cleared.', 'info');
+            } else {
+                showInfo(`Point deleted. ${savedDataPoints.length} measurement${savedDataPoints.length === 1 ? '' : 's'} remaining.`);
+            }
+        }
+
+        function clearAllPoints() {
+            if (savedDataPoints.length === 0) {
+                showInfo('No saved points to clear.', 'error');
+                return;
+            }
+            
+            if (confirm(`Are you sure you want to delete all ${savedDataPoints.length} saved measurements? This cannot be undone.`)) {
+                savedDataPoints = [];
+                currentPlotPoint = null;
+                saveSavedPoints();
+                updateChart();
+                updateSavedPointsList();
+                showInfo('All saved measurements have been cleared.', 'info');
+            }
+        }
+
+        function updateSavedPointsList() {
+            const section = document.getElementById('savedPointsSection');
+            const list = document.getElementById('savedPointsList');
+            
+            if (savedDataPoints.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+            
+            section.style.display = 'block';
+            list.innerHTML = '';
+            
+            savedDataPoints.forEach((point, index) => {
+                const color = POINT_COLORS[index % POINT_COLORS.length];
+                const standardName = point.standard === 'who_cdc' ? 'WHO/CDC' : 'HK 2020';
+                
+                const item = document.createElement('div');
+                item.className = 'saved-point-item';
+                item.innerHTML = `
+                    <div class="saved-point-info">
+                        <div style="display: flex; align-items: center;">
+                            <div class="saved-point-marker" style="background-color: ${color};"></div>
+                            <span class="saved-point-label">${point.label || `Measurement ${index + 1}`}</span>
+                        </div>
+                        <div class="saved-point-details">
+                            ${point.gender === 'boy' ? 'Boy' : 'Girl'} • ${point.age} years • ${point.height} cm • ${point.percentile} percentile • ${standardName} • ${point.date}
+                        </div>
+                    </div>
+                    <button onclick="deletePoint(${point.id})" class="button-danger button-small">Delete</button>
+                `;
+                list.appendChild(item);
+            });
         }
 
         function calculatePercentile(standard, gender, ageMonths, height) {
