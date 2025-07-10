@@ -2,7 +2,7 @@
 import json
 
 # Load and validate the generated data
-with open('data/hk2020-growth-data.json') as f:
+with open('../data/hk2020-growth-data.json') as f:
     data = json.load(f)
 
 print('✅ Data Structure Validation:')

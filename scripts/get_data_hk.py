@@ -22,7 +22,7 @@ import json
 import os
 
 
-def extract_hk_growth_data(csv_file_path='reference/HK-2020-StandardTables_v2.csv'):
+def extract_hk_growth_data(csv_file_path='../reference/HK-2020-StandardTables_v2.csv'):
     """
     Extract Hong Kong 2020 growth chart data from CSV file.
     
@@ -118,7 +118,7 @@ def extract_hk_growth_data(csv_file_path='reference/HK-2020-StandardTables_v2.cs
     }
 
 
-def save_data_file(data, output_path='data/hk2020-growth-data.json'):
+def save_data_file(data, output_path='../data/hk2020-growth-data.json'):
     """
     Save the extracted data to JSON file in the data directory.
     
