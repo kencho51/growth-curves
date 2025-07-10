@@ -3,7 +3,7 @@
 Hong Kong 2020 Growth Chart Data Extractor
 
 This script extracts growth chart data from the official Hong Kong 2020 Growth Survey CSV file
-and formats it for use in JavaScript/HTML applications.
+and formats it for the new application architecture.
 
 Source: HK-2020-StandardTables_v2.csv
 Survey: Hong Kong Growth Survey 2020-22 conducted by Chinese University of Hong Kong 
@@ -13,10 +13,13 @@ CSV Structure:
 - Column 0: Age in months
 - Columns 5-13: Girls percentiles (0.4th, 2nd, 9th, 25th, 50th, 75th, 91st, 98th, 99.6th)
 - Columns 17-25: Boys percentiles (0.4th, 2nd, 9th, 25th, 50th, 75th, 91st, 98th, 99.6th)
+
+Output: data/hk2020-growth-data.json (new nested structure)
 """
 
 import csv
 import json
+import os
 
 
 def extract_hk_growth_data(csv_file_path='reference/HK-2020-StandardTables_v2.csv'):
@@ -27,11 +30,12 @@ def extract_hk_growth_data(csv_file_path='reference/HK-2020-StandardTables_v2.cs
         csv_file_path (str): Path to the CSV file
         
     Returns:
-        dict: Structured growth data for boys and girls
+        dict: Structured growth data for boys and girls in new nested format
     """
     
-    boys_data = {
-        'ages': [],
+    # Initialize data structure to match the new application format
+    boys_ages = []
+    boys_percentiles = {
         'p0_4': [],   # 0.4th percentile
         'p2': [],     # 2nd percentile
         'p9': [],     # 9th percentile
@@ -43,8 +47,8 @@ def extract_hk_growth_data(csv_file_path='reference/HK-2020-StandardTables_v2.cs
         'p99_6': []   # 99.6th percentile
     }
     
-    girls_data = {
-        'ages': [],
+    girls_ages = []
+    girls_percentiles = {
         'p0_4': [],   # 0.4th percentile
         'p2': [],     # 2nd percentile
         'p9': [],     # 9th percentile
@@ -67,28 +71,28 @@ def extract_hk_growth_data(csv_file_path='reference/HK-2020-StandardTables_v2.cs
                     age_months = int(float(row[0]))
                     
                     # Girls data: columns 5-13
-                    girls_data['ages'].append(age_months)
-                    girls_data['p0_4'].append(float(row[5]))   # Girls cent0.4
-                    girls_data['p2'].append(float(row[6]))     # Girls cent2
-                    girls_data['p9'].append(float(row[7]))     # Girls cent9
-                    girls_data['p25'].append(float(row[8]))    # Girls cent25
-                    girls_data['p50'].append(float(row[9]))    # Girls cent50
-                    girls_data['p75'].append(float(row[10]))   # Girls cent75
-                    girls_data['p91'].append(float(row[11]))   # Girls cent91
-                    girls_data['p98'].append(float(row[12]))   # Girls cent98
-                    girls_data['p99_6'].append(float(row[13])) # Girls cent99.6
+                    girls_ages.append(age_months)
+                    girls_percentiles['p0_4'].append(float(row[5]))   # Girls cent0.4
+                    girls_percentiles['p2'].append(float(row[6]))     # Girls cent2
+                    girls_percentiles['p9'].append(float(row[7]))     # Girls cent9
+                    girls_percentiles['p25'].append(float(row[8]))    # Girls cent25
+                    girls_percentiles['p50'].append(float(row[9]))    # Girls cent50
+                    girls_percentiles['p75'].append(float(row[10]))   # Girls cent75
+                    girls_percentiles['p91'].append(float(row[11]))   # Girls cent91
+                    girls_percentiles['p98'].append(float(row[12]))   # Girls cent98
+                    girls_percentiles['p99_6'].append(float(row[13])) # Girls cent99.6
                     
                     # Boys data: columns 17-25
-                    boys_data['ages'].append(age_months)
-                    boys_data['p0_4'].append(float(row[17]))   # Boys cent0.4
-                    boys_data['p2'].append(float(row[18]))     # Boys cent2
-                    boys_data['p9'].append(float(row[19]))     # Boys cent9
-                    boys_data['p25'].append(float(row[20]))    # Boys cent25
-                    boys_data['p50'].append(float(row[21]))    # Boys cent50
-                    boys_data['p75'].append(float(row[22]))    # Boys cent75
-                    boys_data['p91'].append(float(row[23]))    # Boys cent91
-                    boys_data['p98'].append(float(row[24]))    # Boys cent98
-                    boys_data['p99_6'].append(float(row[25]))  # Boys cent99.6
+                    boys_ages.append(age_months)
+                    boys_percentiles['p0_4'].append(float(row[17]))   # Boys cent0.4
+                    boys_percentiles['p2'].append(float(row[18]))     # Boys cent2
+                    boys_percentiles['p9'].append(float(row[19]))     # Boys cent9
+                    boys_percentiles['p25'].append(float(row[20]))    # Boys cent25
+                    boys_percentiles['p50'].append(float(row[21]))    # Boys cent50
+                    boys_percentiles['p75'].append(float(row[22]))    # Boys cent75
+                    boys_percentiles['p91'].append(float(row[23]))    # Boys cent91
+                    boys_percentiles['p98'].append(float(row[24]))    # Boys cent98
+                    boys_percentiles['p99_6'].append(float(row[25]))  # Boys cent99.6
                     
                 except (ValueError, IndexError):
                     # Skip rows with invalid data
@@ -101,98 +105,121 @@ def extract_hk_growth_data(csv_file_path='reference/HK-2020-StandardTables_v2.cs
         print(f"Error reading CSV file: {e}")
         return None
     
+    # Return data in the new nested structure format
     return {
-        'boy': boys_data,
-        'girl': girls_data
+        'boy': {
+            'ages': boys_ages,
+            'percentiles': boys_percentiles
+        },
+        'girl': {
+            'ages': girls_ages,
+            'percentiles': girls_percentiles
+        }
     }
 
 
-def format_for_javascript(data):
+def save_data_file(data, output_path='data/hk2020-growth-data.json'):
     """
-    Format the extracted data for use in JavaScript.
+    Save the extracted data to JSON file in the data directory.
     
     Args:
         data (dict): Growth data from extract_hk_growth_data()
+        output_path (str): Output file path
         
     Returns:
-        str: JavaScript-formatted data structure
+        bool: True if successful, False otherwise
     """
     
     if not data:
-        return None
+        print("No data to save")
+        return False
     
-    js_output = []
+    try:
+        # Ensure the data directory exists
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        
+        # Save to the data directory with compact format (same as current file)
+        with open(output_path, 'w') as f:
+            json.dump(data, f, separators=(',', ':'))
+        
+        print(f"✅ Data saved to '{output_path}'")
+        return True
+        
+    except Exception as e:
+        print(f"❌ Error saving data file: {e}")
+        return False
+
+
+def display_sample_data(data):
+    """
+    Display sample data for verification.
+    
+    Args:
+        data (dict): Growth data to display
+    """
+    
+    if not data:
+        return
+    
+    print("\n" + "=" * 60)
+    print("SAMPLE DATA VERIFICATION")
+    print("=" * 60)
     
     for gender in ['boy', 'girl']:
         gender_data = data[gender]
+        total_points = len(gender_data['ages'])
+        age_range_months = (min(gender_data['ages']), max(gender_data['ages']))
+        age_range_years = (age_range_months[0] / 12, age_range_months[1] / 12)
         
-        js_output.append(f"                {gender}: {{")
-        js_output.append(f"                    // Hong Kong 2020 Growth Survey 2020-22 - ALL data from official CSV ({len(gender_data['ages'])} data points)")
-        js_output.append(f"                    // Source: HK-2020-StandardTables_v2.csv")
-        js_output.append(f"                    ages: {gender_data['ages']},")
-        js_output.append(f"                    percentiles: {{")
+        print(f"\n{gender.title()}s:")
+        print(f"  • Data points: {total_points}")
+        print(f"  • Age range: {age_range_months[0]} to {age_range_months[1]} months ({age_range_years[0]:.1f} to {age_range_years[1]:.1f} years)")
+        print(f"  • 50th percentile at 18 years: {gender_data['percentiles']['p50'][-1]} cm")
         
-        percentiles = ['p0_4', 'p2', 'p9', 'p25', 'p50', 'p75', 'p91', 'p98', 'p99_6']
-        percentile_labels = ['0.4th', '2nd', '9th', '25th', '50th', '75th', '91st', '98th', '99.6th']
-        
-        for i, (p_key, p_label) in enumerate(zip(percentiles, percentile_labels)):
-            comma = "," if i < len(percentiles) - 1 else ""
-            js_output.append(f"                        {p_key}: {gender_data[p_key]}{comma} // {p_label} percentile")
-        
-        js_output.append(f"                    }}")
-        
-        if gender == 'boy':
-            js_output.append(f"                }},")
-        else:
-            js_output.append(f"                }}")
-    
-    return "\n".join(js_output)
+        # Show first few data points
+        print(f"  • First 3 ages: {gender_data['ages'][:3]} months")
+        print(f"  • First 3 heights (50th percentile): {gender_data['percentiles']['p50'][:3]} cm")
 
 
 def main():
-    """Main function to extract and display Hong Kong growth data."""
+    """Main function to extract and save Hong Kong growth data."""
     
-    print("Hong Kong 2020 Growth Chart Data Extractor")
-    print("=" * 50)
+    print("🇭🇰 Hong Kong 2020 Growth Chart Data Extractor")
+    print("=" * 60)
+    print("Generating data for the new application architecture...")
+    print()
     
     # Extract data from CSV
-    print("Extracting data from CSV file...")
+    print("📊 Extracting data from CSV file...")
     data = extract_hk_growth_data()
     
     if not data:
-        print("Failed to extract data. Please check the CSV file path and format.")
+        print("❌ Failed to extract data. Please check the CSV file path and format.")
         return
     
-    # Display summary
-    total_points = len(data['boy']['ages'])
-    age_range_months = (min(data['boy']['ages']), max(data['boy']['ages']))
-    age_range_years = (age_range_months[0] / 12, age_range_months[1] / 12)
+    print("✅ Data extraction successful!")
     
-    print(f"Successfully extracted {total_points} data points")
-    print(f"Age range: {age_range_months[0]} to {age_range_months[1]} months ({age_range_years[0]:.1f} to {age_range_years[1]:.1f} years)")
-    print()
+    # Display sample data for verification
+    display_sample_data(data)
     
-    # Format for JavaScript
-    print("JavaScript-formatted data structure:")
-    print("=" * 50)
-    js_formatted = format_for_javascript(data)
-    if js_formatted:
-        print("            hk2020: {")
-        print(js_formatted)
-        print("            }")
+    # Save to the new location
+    print(f"\n💾 Saving data to application directory...")
+    success = save_data_file(data)
     
-    # Save to JSON file for backup
-    try:
-        with open('hk2020_growth_data.json', 'w') as f:
-            json.dump(data, f, indent=2)
-        print(f"\nData also saved to 'hk2020_growth_data.json' for backup")
-    except Exception as e:
-        print(f"Warning: Could not save JSON backup: {e}")
+    if success:
+        print(f"\n🎉 SUCCESS! Hong Kong 2020 growth data has been updated.")
+        print(f"   The application will now use the latest data from the CSV source.")
+        print(f"\n📁 File structure:")
+        print(f"   data/hk2020-growth-data.json ← Updated with fresh data")
+        print(f"   data/who-cdc-growth-data.json ← Unchanged")
+    else:
+        print(f"\n❌ Failed to save data. Please check file permissions.")
     
-    # Sample data verification
-    print(f"\nSample verification:")
-    print(f"Boys 18 years (216 months) - 50th percentile: {data['boy']['p50'][-1]} cm")
-    print(f"Girls 18 years (216 months) - 50th percentile: {data['girl']['p50'][-1]} cm")
+    print(f"\n📋 Data Summary:")
+    print(f"   • Hong Kong 2020 Growth Survey 2020-22")
+    print(f"   • Chinese University of Hong Kong & University of Hong Kong")
+    print(f"   • 9 percentiles: 0.4th, 2nd, 9th, 25th, 50th, 75th, 91st, 98th, 99.6th")
+    print(f"   • Age range: 0-18 years (87 data points)")
 
 
 if __name__ == "__main__":

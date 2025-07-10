@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+# Sitemap location (update with your actual domain)
+Sitemap: https://growth-curves.superbrains.cc/sitemap.xml
+
+# Allow crawling of CSS and JS files
+Allow: *.css
+Allow: *.js
+
+# Block crawling of any admin or private directories (if you add them later)
+Disallow: /admin/
+Disallow: /private/ 
