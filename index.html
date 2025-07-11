@@ -140,7 +140,12 @@
         <div class="saved-points-section" id="savedPointsSection" style="display: none;">
             <div class="saved-points-header">
                 <h3 style="margin: 0; color: #333;">Saved Data Points</h3>
-                <button onclick="clearAllPoints()" class="button-danger button-small">Clear All</button>
+                <div class="saved-points-actions">
+                    <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
+                    <button onclick="document.getElementById('importFile').click()" class="button-secondary button-small">Import</button>
+                    <button onclick="exportData()" class="button-secondary button-small">Export</button>
+                    <button onclick="clearAllPoints()" class="button-danger button-small">Clear All</button>
+                </div>
             </div>
             <div class="saved-points-list" id="savedPointsList">
                 <!-- Saved points will be populated dynamically -->

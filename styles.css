@@ -191,6 +191,17 @@ button:hover {
     padding: 20px;
 }
 
+.saved-points-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.saved-points-actions .button-small {
+    font-size: 12px;
+    padding: 4px 8px;
+}
+
 /* Usage Guide Section */
 .usage-guide {
     margin-top: 30px;

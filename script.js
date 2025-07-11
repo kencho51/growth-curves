@@ -545,6 +545,75 @@ function showInfo(message, type = 'info') {
 }
 
 /**
+ * Export saved data points to JSON file
+ */
+function exportData() {
+    if (savedDataPoints.length === 0) {
+        showInfo('No saved data to export.', 'error');
+        return;
+    }
+    
+    const exportData = {
+        version: '1.0',
+        exportDate: new Date().toISOString(),
+        dataPoints: savedDataPoints
+    };
+    
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+        type: 'application/json'
+    });
+    
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `growth-data-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    showInfo(`Exported ${savedDataPoints.length} data points successfully.`);
+}
+
+/**
+ * Import saved data points from JSON file
+ */
+function importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const imported = JSON.parse(e.target.result);
+            
+            // Validate structure
+            if (!imported.dataPoints || !Array.isArray(imported.dataPoints)) {
+                throw new Error('Invalid file format');
+            }
+            
+            // Merge with existing data (avoiding duplicates by ID)
+            const existingIds = new Set(savedDataPoints.map(p => p.id));
+            const newPoints = imported.dataPoints.filter(p => !existingIds.has(p.id));
+            
+            savedDataPoints.push(...newPoints);
+            saveSavedPoints();
+            updateChart();
+            updateSavedPointsList();
+            
+            showInfo(`Imported ${newPoints.length} new data points. Total: ${savedDataPoints.length} points.`);
+        } catch (error) {
+            showInfo('Error importing file. Please check the file format.', 'error');
+            console.error('Import error:', error);
+        }
+    };
+    reader.readAsText(file);
+    
+    // Reset file input
+    event.target.value = '';
+}
+
+/**
  * Initialize the application when DOM is loaded
  */
 document.addEventListener('DOMContentLoaded', function() {
